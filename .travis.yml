@@ -1,0 +1,17 @@
+sudo: required
+
+services:
+  - docker
+
+install: true
+
+script:
+  - docker build -t arygmzv90/odoo-docker .
+
+after_success: |
+  if [ -n "${DOCKER_EMAIL}" ] && [ -n "${DOCKER_TOKEN}" ] && [ "${TRAVIS_PULL_REQUEST}" = 'false' ]
+  then
+    mkdir -p $HOME/.docker
+    echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"${DOCKER_TOKEN}\",\"email\":\"${DOCKER_EMAIL}\"}}}" > $HOME/.docker/config.json
+    docker push arygmzv90/odoo-docker || exit 1
+  fi
